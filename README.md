@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# SoftZing Desktop Template
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Base template cho tất cả ứng dụng desktop của SoftZing. Khi tạo app mới, copy toàn bộ repo này làm điểm khởi đầu.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+| Layer | Công nghệ |
+|---|---|
+| Desktop runtime | Tauri 2.x (Rust) |
+| Frontend | React 18 + TypeScript |
+| Bundler | Vite 8 |
+| Styling | Tailwind CSS v3 |
+| Routing | React Router v6 |
+| Icons | lucide-react |
+| i18n | i18next + react-i18next |
 
-## React Compiler
+## Tính năng
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Custom Titlebar** — Thay thế titlebar OS, hỗ trợ kéo cửa sổ và nút min/max/close
+- **Sidebar collapsible** — Thu gọn/mở rộng, trạng thái được lưu qua các lần khởi động
+- **Dark / Light mode** — Chuyển đổi giao diện, không bị flash khi reload
+- **Đa ngôn ngữ** — Tiếng Anh và Tiếng Việt, dễ thêm ngôn ngữ mới
+- **Settings page** — Trang cài đặt với các section General và About
 
-## Expanding the ESLint configuration
+## Yêu cầu
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [Node.js](https://nodejs.org/) 18+
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Tauri prerequisites](https://tauri.app/start/prerequisites/)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Cài đặt
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/truongair/SoftZing.git
+cd SoftZing
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Lệnh
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npx tauri dev       # Chạy app ở dev mode
+npx tauri build     # Build installer
+npm run build       # Build frontend only
+npx tsc --noEmit    # Kiểm tra TypeScript
 ```
+
+## Thêm trang mới
+
+**1.** Tạo file trang:
+```
+src/components/pages/MyPage.tsx
+```
+
+**2.** Thêm vào `src/router/routes.tsx`:
+```typescript
+{ path: '/my-page', labelKey: 'nav.myPage', icon: SomeIcon }
+```
+
+**3.** Thêm translation key vào `src/i18n/locales/en.ts` và `vi.ts`:
+```typescript
+nav: { myPage: 'My Page' }
+```
+
+**4.** Thêm `<Route>` vào `src/App.tsx`:
+```tsx
+<Route path="my-page" element={<MyPage />} />
+```
+
+Sidebar tự động hiển thị entry mới.
+
+## Cấu trúc thư mục
+
+```
+src/
+├── components/
+│   ├── layout/        # AppLayout, Titlebar, Sidebar
+│   ├── ui/            # NavItem, ThemeToggle, LanguageToggle, SectionHeader
+│   └── pages/         # HomePage, SettingsPage, NotFoundPage
+├── context/           # ThemeContext
+├── hooks/             # useTheme, useWindowControls
+├── i18n/
+│   └── locales/       # en.ts, vi.ts
+├── router/            # routes.tsx — nguồn duy nhất cho sidebar + router
+└── styles/            # globals.css — CSS variables + Tailwind
+src-tauri/
+├── capabilities/      # Window permissions (Tauri 2 bắt buộc)
+└── tauri.conf.json    # decorations: false, 1100×700
+```
+
+## Khi tạo app mới từ template
+
+1. Đổi `identifier` trong `src-tauri/tauri.conf.json` (tránh conflict registry Windows)
+2. Đổi `productName` trong `tauri.conf.json` và `name` trong `package.json`
+3. Đổi `title` trong `index.html`
+4. Xóa các trang placeholder và thêm trang của app mới
+
+## License
+
+MIT
